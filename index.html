@@ -100,42 +100,29 @@ function createAndSendDocument() {
         </figure>
     </section>
     <section>
-    	<h3>2.2. Datenschutz und -sicherheit</h3>
+    	<h3>Auto Scaling</h3>
     	<p>
-        Bei solchen hohen Nutzerzahlen haben beide Anbieter eine große Verantwortung bezüglich der Sicherheit der Daten. Dazu zählen natürlich angemessene
-        Datenschutzrichtlinien und Verschlüsselungstechniken, aber auch die Ermutigung und Aufklärung des Anwenders den eigenen Account so einbruchssicher wie
-        möglich zu gestalten. Dies beginnt schon bei der Registrierung, nämlich mit der Festlegung eines starken Passworts.
-    	</p>
-    	<p>
-        Beide Dienste weisen bei der Registrierung auf die Stärke des Passworts mit Hilfe eines Farbbalkens hin. Die Einstufung erhöht sich je länger die Eingabe
-        wird und je mehr zwischen Groß- und Kleinschreibung, Zahlen und Sonderzeichen variiert wird <a href="#r3">[3]</a>. Zusätzlich wird von beiden die zweistufige Verifizierung stark
-        empfohlen, bei der nicht nur Username und Passwort, sondern ein zusätzlicher Pin ans Handy gesendet wird, um sicherzustellen, dass es sich wirklich um
-        den bestimmten Nutzer handelt. Aber auch hier unterscheiden sich Google und Dropbox in den Details der Umsetzung. Während Dropbox diesen Code entweder per SMS verschickt
-        oder über eine App generieren lässt <a href="#r7">[7]</a>, bietet Google zusätzlich die Übermittlung per Sprachanruf und die Variante der Backup-Codes an <a href="#r8">[8]</a>. Letztere sind vor
-        allem nützlich, wenn das Smartphone bzw. der Empfang gerade nicht zur Hand ist.
-    	</p>
-    	<p>
-        Der nächste wichtige Sicherheitsaspekt ist die Übertragung der Daten. Diese findet bei beiden selbstverständlich über SSL/TSL und HTTPS statt. Danach
-        findet die serverseitige Verschlüsselung über AES-256 bei Dropbox <a href="#r7">[7]</a> und AES-128 bei Google <a href="#r8">[8]</a> statt. Beide verschlüsseln die Daten
-        jedoch mit eigenen generierten Schlüsseln, was zu der Kritik führt, dass „[s]ince Dropbox itself encrypts the data on the server-side, users cannot be sure
-        by cryptographic means that all stored data is highly confidential“ <a href="#r3">[3]</a>. Über Google ist die Kritik sogar noch lauter, denn hier wird
-        erst seit gut einem Jahr serverseitig verschlüsselt <a href="#r1">[1]</a>. Zuvor wiesen Mitarbeiter des GoogleDrive Team
-        nur auf die sichere Kommunikation zwischen Server und Client hin bzw. machten auf den Gebrauch der zwei-Schritt-Verifizierung aufmerksam <a href="#r1">[1]</a>. 
-    	Dass die Schlüssel jedoch selbst generiert und verwaltet werden, sorgt auch hier für Unwohlsein <a href="#r1">[1]</a>.
-    	</p>
-    	<p>
-        Aus diesem Problem hat sich ein ganz eigener Markt entwickelt. Dropbox selbst weist in ihrem Helpcenter auf „zahlreiche Drittanbieter“ <a href="#r7">[7]</a>
-        hin, mit Hilfe welcher Anwender ihre Daten selber verschlüsseln können, bevor sie diese in die Cloud hochladen. Auch Borgmann et al. kommen zu dem Schluss,
-        dass es „a whole range of alternative methods“<a href="#r3">[3]</a> gibt, um die eigenen Daten schon lokal zu verschlüsseln und selber die Schlüssel zu verwalten. Einer
-        dieser Anbieter ist Boxcryptor, 2011 gegründet und mit mittlerweile über 1 Millionen Downloads oft genutzt <a href="#r4">[4]</a>.
-    	</p>
-    	<p>
-        Boxcryptor ist eine Anwendung die speziell zur Verschlüsselung von Daten, welche anschließend in der Cloud gespeichert werden sollen, entwickelt wurde. Das
-        Prinzip ist recht simpel. Die zu verschlüsselnden Daten werden in einem entsprechenden Ordner auf einem virtuellen Laufwerk abgelegt und dort mit Hilfe der
-        AES-256 und RSA Algorithmen verschlüsselt. Danach erst werden die Dateien in den Cloud Ordner weitergegeben. Verschlüsselte Daten sind farblich markiert
-        und leicht von anderen, nicht verschlüsselten Daten, zu unterscheiden. Diese Software ist kompatibel mit allen großen Cloud Dienst Anbietern und allen Betriebssystemen. Auch für Android, iOS und
-        Blackberry gibt es Apps, sodass hier ebenfalls keine Einschränkung besteht <a href="#r4">[4]</a>.
-    	</p>
+            5.4 Autoscaling
+            One of the most important features of kubernetes is auto scaling. It monitors applications and services built with container technology without the help of human interaction. There are three autoscalers in the latest version of kubernetes. 
+            Horizontal Pod Autoscaler (HPA) [1]  handles pod adjustments more dynamically and powerfully by monitoring resource consumption of the applications.
+            Vertical Pod Autoscaler (VPA) [1] instantly changes the yaml specifications, such as pods minimum requirement and maintains the number of working pods. Therefore, it kills the existing pods and thus disrupts the state of the applications and services.
+            Cluster Autoscaler (CA) [1] raises the number of nodes only when it is not possible to schedule pods on the existing nodes. Cluster Autoscaler only works on cloud platforms run by commercial company such as Google Cloud Platform [11] and Amazon Web Services [10]
+            5.4.1 Horizontal Pod Autoscaling (HPA)
+            In Kubernetes, HPA is a great tool that automatically increases or decreases the number of pods based on the overall computational and processing power of the application’s without affecting the current running pods (see Fig 1). HPA is a controlled loop implemented by the controller manager. In every 15 seconds (called a sync cycle), the kube controller manager compares the metrics (collected from either the resource metrics API or the custom metrics API) with the resource utilization [1].
+            
+            Figure 1: Architecture of Kubernetes HPA [1]
+            
+            The HPA controller operates according to the algorithm in equation 1
+            
+            desiredReplicas = currentReplicas * ( currentMetricValue / desiredMetricValue )    (1)
+            
+            where desiredReplicas is the number of pods after autoscaling on the other side currentReplicas defined as the number of pods which are currently running, currentMetricValue denoted as the latest collected metric value and finally, target threshold is defined as desiredMetricValue.
+            Figure 5b: Metric Data of Demo-application
+            
+            Figure 5b shows the configuration and metrics of our Demo application. Where “MINPODS” and “MAXPODS” are the requirements for the kubernetes cluster which refer to the minimum and maximum number of pods. In the figure the minimum pods requirement for the cluster is 1 and maximum is 10. The kube controller manager continuously tracks this replica set number and compares it with the above requirements. For the scaling operation, CPU usages are going to be used as a metric. We set a 10% threshold for the CPU usages. Therefore, when the application reaches the 10% threshold, HPA will automatically increase the number of pods according to equation 1. 
+            
+            For example, according to the fig 5b if the current metric value is 40%  and the desired value is 10%, the number of replicas will be (1 x (0.40 / 0.10)) or 4. Therefore, the kube controller manager calls the kube api server to create 3 more pods. If the current metric value declines to 20% CPU usage, then the desired replicas will be (4 x (0.20/0.10)) or 8. Therefore, 4 more pods will be created. On 
+          </p>            
     </section>
    
     
